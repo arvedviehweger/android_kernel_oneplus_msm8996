@@ -436,4 +436,10 @@ obj-$(CONFIG_SND_SOC_OPA1622)	+= snd-soc-opa1622.o
 obj-$(CONFIG_SND_SOC_LM48560)	+= snd-soc-lm48560.o
 obj-y += sdm660_cdc/
 obj-y += msm_sdw/
+# The OnePlus 3 uses its own TFA9890 driver, the Xiaomi boards the tfa98xx one
+ifeq ($(CONFIG_MACH_ONEPLUS_MSM8996),y)
+snd-soc-tfa9890-objs := tfa9890/tfa98xx.o tfa9890/tfa_dsp.o tfa9890/tfa_container.o
+obj-y += snd-soc-tfa9890.o
+else
 obj-y	+= tfa98xx/
+endif
