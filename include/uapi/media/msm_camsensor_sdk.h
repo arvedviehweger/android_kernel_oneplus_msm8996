@@ -100,6 +100,8 @@ enum msm_camera_i2c_data_type {
 	MSM_CAMERA_I2C_SET_WORD_MASK,
 	MSM_CAMERA_I2C_UNSET_WORD_MASK,
 	MSM_CAMERA_I2C_SET_BYTE_WRITE_MASK_DATA,
+	MSM_CAMERA_I2C_SEQ_DATA,
+	/* after SEQ_DATA to keep the value the OnePlus camera blobs expect */
 	MSM_CAMERA_I2C_NO_DATA,
 	MSM_CAMERA_I2C_DATA_TYPE_MAX,
 };
