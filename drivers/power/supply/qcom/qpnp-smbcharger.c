@@ -250,7 +250,6 @@ struct smbchg_chip {
 	u32				wa_flags;
 	int				usb_icl_delta;
 	bool				typec_dfp;
-	unsigned int			usb_current_max;
 	unsigned int			usb_health;
 
 	/* jeita and temperature */
@@ -4080,9 +4079,12 @@ static void smbchg_external_power_changed(struct power_supply *psy)
 									rc);
 	}
 
-	current_limit = chip->usb_current_max / 1000;
+	/* the usb psy reports CURRENT_MAX from the PSY_ICL vote */
+	current_limit = get_client_vote(chip->usb_icl_votable, PSY_ICL_VOTER);
+	if (current_limit < 0)
+		current_limit = 0;
 
-	if (chip->usb_current_max <= 2 && get_prop_batt_present(chip)) {
+	if (current_limit <= 2 && get_prop_batt_present(chip)) {
 		/* charger removed, set pre_current_limit 0 */
 		pre_current_limit = 0;
 		chip->chg_ovp = false;
