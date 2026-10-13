@@ -258,7 +258,13 @@ static long msm_ispif_cmd_ext(struct v4l2_subdev *sd,
 		pcdata.size = pcdata64->size;
 		pcdata.data = pcdata64->data;
 	}
-	if (pcdata.size != sizeof(struct msm_ispif_param_data_ext)) {
+	/*
+	 * Camera blobs built before line_width was added send the struct
+	 * without it. params is zeroed, so line_width stays 0 and unused.
+	 */
+	if (pcdata.size != sizeof(struct msm_ispif_param_data_ext) &&
+	    pcdata.size != offsetof(struct msm_ispif_param_data_ext,
+				    line_width)) {
 		pr_err("%s: payload size mismatch\n", __func__);
 		return -EINVAL;
 	}
