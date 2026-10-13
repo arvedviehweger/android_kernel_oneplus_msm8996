@@ -6380,7 +6380,12 @@ wait:
 		goto no_profile;
 	}
 
-	batt_id = get_sram_prop_now(chip, FG_DATA_BATT_ID);
+	/*
+	 * OnePlus batteries have no usable ID resistor. The bms psy reports
+	 * a fixed ID based on the battery voltage instead, and 3.18 picked
+	 * the profile through that property, so use the same mapping here.
+	 */
+	batt_id = chip->battery_4p4v_present ? OP_4P4V_BAT_ID : OP_4P35V_BAT_ID;
 	batt_id /= 1000;
 	if (fg_debug_mask & FG_STATUS)
 		pr_info("battery id = %dKOhms\n", batt_id);
