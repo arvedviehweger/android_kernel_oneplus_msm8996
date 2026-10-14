@@ -74,7 +74,7 @@ static struct msm_camera_tz_ctrl_t msm_camera_tz_ctrl = {
 
 static DEFINE_MUTEX(msm_camera_tz_util_lock);
 
-struct qseecom_handle *msm_camera_tz_get_ta_handle(void)
+struct qseecom_handle *msm_camera_tz_get_ta_handle()
 {
 	return msm_camera_tz_ctrl.ta_qseecom_handle;
 }

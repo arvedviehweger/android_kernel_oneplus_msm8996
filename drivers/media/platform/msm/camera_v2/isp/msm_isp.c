@@ -468,7 +468,7 @@ static int isp_vma_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 {
 	struct page *page;
 	struct vfe_device *vfe_dev = vma->vm_private_data;
-	struct isp_proc *isp_page = NULL;
+	struct isp_kstate *isp_page = NULL;
 
 	isp_page = vfe_dev->isp_page;
 
@@ -586,20 +586,21 @@ static int vfe_probe(struct platform_device *pdev)
 		if (!node) {
 			pr_err("%s: Error! Cannot find node in dtsi %s\n",
 				__func__, name);
-			break;
+			goto end;
 		}
 		new_dev = of_find_device_by_node(node);
 		if (!new_dev) {
 			pr_err("%s: Failed to find device on bus %s\n",
 				__func__, node->name);
-			break;
+			goto end;
 		}
 		new_dev->dev.platform_data = &vfe_common_data;
 		rc = vfe_set_common_data(new_dev);
 		if (rc < 0)
-			break;
+			goto end;
 	}
 
+end:
 	return rc;
 }
 
@@ -727,7 +728,7 @@ int vfe_hw_probe(struct platform_device *pdev)
 	vfe_dev->buf_mgr->init_done = 1;
 	vfe_dev->vfe_open_cnt = 0;
 	/*Allocate a page in kernel and map it to camera user process*/
-	vfe_dev->isp_page = (struct isp_proc *)get_zeroed_page(GFP_KERNEL);
+	vfe_dev->isp_page = (struct isp_kstate *)get_zeroed_page(GFP_KERNEL);
 	if (vfe_dev->isp_page == NULL) {
 		pr_err("%s: no enough memory\n", __func__);
 		rc = -ENOMEM;
