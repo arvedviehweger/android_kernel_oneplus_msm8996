@@ -21,6 +21,7 @@
 #include <linux/platform_device.h>
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
+#include <linux/switch.h>
 #include <linux/uaccess.h>
 
 #define DRIVER_NAME "tri-state-key"
@@ -41,6 +42,7 @@ static const char *const proc_names[] = {
 struct tristate_data {
 	struct device *dev;
 	struct input_dev *input;
+	struct switch_dev sdev;
 	struct mutex irq_lock;
 	enum key_vals key_codes[NR_STATES];
 	int key_gpios[NR_STATES];
@@ -83,6 +85,8 @@ static void tristate_process_state(struct tristate_data *t)
 	 */
 	i = ffz(key_state);
 	send_input(t, t->key_codes[i]);
+	/* Positions 1 (top) to 3 (bottom) for the alert slider handler */
+	switch_set_state(&t->sdev, i + 1);
 }
 
 static irqreturn_t tristate_irq_handler(int irq, void *dev_id)
@@ -299,6 +303,11 @@ static int tristate_probe(struct platform_device *pdev)
 	if (ret)
 		goto free_input;
 
+	t->sdev.name = DRIVER_NAME;
+	ret = switch_dev_register(&t->sdev);
+	if (ret)
+		goto input_unregister;
+
 	/* Initialize with default keycodes */
 	for (i = 0; i < NR_STATES; i++)
 		t->key_codes[i] = KEYCODE_TOTAL_SILENCE + i;
@@ -315,6 +324,8 @@ static int tristate_probe(struct platform_device *pdev)
 	return 0;
 
 input_unregister:
+	if (t->sdev.dev)
+		switch_dev_unregister(&t->sdev);
 	input_unregister_device(t->input);
 free_input:
 	input_free_device(t->input);
