@@ -10061,7 +10061,7 @@ static const struct file_operations proc_ship_mode_operations = {
 #endif
 
 /* for usb notification */
-static int set_usb_redetec(const char *val, struct kernel_param *kp)
+static int set_usb_redetec(const char *val, const struct kernel_param *kp)
 {
 	struct smbchg_chip *chip = g_chip;
 	enum power_supply_type usb_supply_type;
